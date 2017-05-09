@@ -22,7 +22,7 @@ func (tarZstFormat) Match(filename string) bool {
 	return strings.HasSuffix(strings.ToLower(filename), ".tar.zst") || strings.HasSuffix(strings.ToLower(filename), ".tzst") || isTarZst(filename)
 }
 
-// isTarZst checks the file has the Zstd compressed Tar format header by
+// isTarZst checks the file has the Zst compressed Tar format header by
 // reading its beginning block.
 func isTarZst(tarzstPath string) bool {
 	f, err := os.Open(tarzstPath)
@@ -31,9 +31,9 @@ func isTarZst(tarzstPath string) bool {
 	}
 	defer f.Close()
 
-	szr := zstd.NewReader(f)
+	zstr := zstd.NewReader(f)
 	buf := make([]byte, tarBlockSize)
-	n, err := szr.Read(buf)
+	n, err := zstr.Read(buf)
 	if err != nil || n < tarBlockSize {
 		return false
 	}
@@ -70,6 +70,6 @@ func (tarZstFormat) Open(source, destination string) error {
 	}
 	defer f.Close()
 
-	zstdr := zstd.NewReader(f)
-	return untar(tar.NewReader(zstdr), destination)
+	zstr := zstd.NewReader(f)
+	return untar(tar.NewReader(zstr), destination)
 }
