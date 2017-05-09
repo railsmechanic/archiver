@@ -2,10 +2,11 @@ package archiver
 
 import (
 	"archive/tar"
-	"compress/gzip"
 	"fmt"
 	"os"
 	"strings"
+
+	gzip "github.com/klauspost/compress/gzip"
 )
 
 // TarGz is for TarGz format
