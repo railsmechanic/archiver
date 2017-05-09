@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mholt/archiver"
+	"github.com/railsmechanic/archiver"
 )
 
 func main() {
