@@ -78,6 +78,8 @@ const usage = `Usage: archiver {make|open} <archive file> [files...]
       .tlz4
       .tar.sz
       .tsz
+      .tar.zst
+      .tzst
       .rar (open only)
 
   Existing files:
