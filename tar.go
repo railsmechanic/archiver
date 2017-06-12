@@ -124,49 +124,48 @@ func tarFile(tarWriter *tar.Writer, source, dest string) error {
 	}
 
 	return filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return fmt.Errorf("error walking to %s: %v", path, err)
-		}
-
-		header, err := tar.FileInfoHeader(info, path)
-		if err != nil {
-			return fmt.Errorf("%s: making header: %v", path, err)
-		}
-
-		if baseDir != "" {
-			header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, source))
-		}
-
-		if header.Name == dest {
-			// our new tar file is inside the directory being archived; skip it
-			return nil
-		}
-
-		if info.IsDir() {
-			header.Name += "/"
-		}
-
-		err = tarWriter.WriteHeader(header)
-		if err != nil {
-			return fmt.Errorf("%s: writing header: %v", path, err)
-		}
-
-		if info.IsDir() {
-			return nil
-		}
-
-		if header.Typeflag == tar.TypeReg {
-			file, err := os.Open(path)
+		if err == nil {
+			header, err := tar.FileInfoHeader(info, path)
 			if err != nil {
-				return fmt.Errorf("%s: open: %v", path, err)
+				return fmt.Errorf("%s: making header: %v", path, err)
 			}
-			defer file.Close()
 
-			_, err = io.CopyN(tarWriter, file, info.Size())
-			if err != nil && err != io.EOF {
-				return fmt.Errorf("%s: copying contents: %v", path, err)
+			if baseDir != "" {
+				header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, source))
+			}
+
+			if header.Name == dest {
+				// our new tar file is inside the directory being archived; skip it
+				return nil
+			}
+
+			if info.IsDir() {
+				header.Name += "/"
+			}
+
+			err = tarWriter.WriteHeader(header)
+			if err != nil {
+				return fmt.Errorf("%s: writing header: %v", path, err)
+			}
+
+			if info.IsDir() {
+				return nil
+			}
+
+			if header.Typeflag == tar.TypeReg {
+				file, err := os.Open(path)
+				if err != nil {
+					return fmt.Errorf("%s: open: %v", path, err)
+				}
+				defer file.Close()
+
+				_, err = io.CopyN(tarWriter, file, info.Size())
+				if err != nil && err != io.EOF {
+					return fmt.Errorf("%s: copying contents: %v", path, err)
+				}
 			}
 		}
+
 		return nil
 	})
 }
